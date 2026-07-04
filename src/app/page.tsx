@@ -132,6 +132,8 @@ export default function Home() {
 
     initStream();
 
+    // Return cleanup function to cleanly cancel/unsubscribe any scheduled event polling timeouts.
+    // This prevents memory leaks and overlapping execution threads when the component unmounts.
     return () => {
       if (pollTimeoutRef.current) {
         clearTimeout(pollTimeoutRef.current);
