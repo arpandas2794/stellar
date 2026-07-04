@@ -1,5 +1,15 @@
 # Stellar Dev Track — Level 1, 2 & 3 Submission
 
+[![CI/CD](https://github.com/arpandas2794/stellar/actions/workflows/ci.yml/badge.svg)](https://github.com/arpandas2794/stellar/actions/workflows/ci.yml)
+[![Network](https://img.shields.io/badge/network-Stellar%20Testnet-7D00FF)](https://stellar.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Rust](https://img.shields.io/badge/Rust-Soroban-DEA584?logo=rust&logoColor=white)](https://soroban.stellar.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?logo=vercel)](https://stellar-neon-ten.vercel.app)
+[![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen)](#-testing)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#-license)
+
 Three progressively advanced dApps built on the **Stellar Testnet**: a peer-to-peer XLM payment app (Level 1), a multi-wallet Soroban smart contract app with real-time event sync (Level 2), and a production-grade dApp with inter-contract communication, event streaming, CI/CD, and full test coverage (Level 3).
 
 🔗 **Live Demo:** [https://stellar-neon-ten.vercel.app](https://stellar-neon-ten.vercel.app)
@@ -20,6 +30,8 @@ Three progressively advanced dApps built on the **Stellar Testnet**: a peer-to-p
 ---
 
 ## Level 1 — Stellar Pay (XLM Payment dApp)
+
+![Status](https://img.shields.io/badge/status-complete-brightgreen) ![Level](https://img.shields.io/badge/level-1-blue)
 
 A simple, clean payment dApp that allows users to connect their Freighter wallet, view their XLM balance, and send XLM to any Stellar address — with full transaction feedback.
 
@@ -132,6 +144,8 @@ Transaction confirmed on Stellar Testnet:
 ---
 
 ## Level 2 — OnChain Notes (Soroban Smart Contract dApp)
+
+![Status](https://img.shields.io/badge/status-complete-brightgreen) ![Level](https://img.shields.io/badge/level-2-blue)
 
 Level 2 builds directly on the Level 1 project and moves from simple peer-to-peer payments into **smart contract territory**: multi-wallet coordination, a deployed Soroban contract, real transaction status tracking, and real-time event-driven state sync. Instead of moving XLM from Account A to Account B, users connect any supported wallet, write a note, sign it, submit it to a custom on-chain contract, and watch a live feed update as events occur — including per-author ownership controls (delete) and a second write path (like).
 
@@ -264,6 +278,8 @@ sequenceDiagram
 ---
 
 ## Level 3 — OnChain Notes + Reputation (Production-Ready dApp)
+
+![Status](https://img.shields.io/badge/status-complete-brightgreen) ![Level](https://img.shields.io/badge/level-3-blue) ![Contracts](https://img.shields.io/badge/contracts-2%20deployed-9146FF)
 
 Level 3 turns the project from a working demo into a **production-grade dApp**: a second Soroban contract (`reputation`) that `onchain_notes` calls into directly (true inter-contract communication), a cursor-based real-time event stream across both contracts, a full CI/CD pipeline running contract and frontend tests on every push, a mobile-responsive UI, and complete test coverage on both the Rust and TypeScript sides.
 
