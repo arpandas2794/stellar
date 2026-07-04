@@ -12,8 +12,10 @@ export interface ClassifiedError {
   message: string;
 }
 
-export function classifyStellarError(error: any): ClassifiedError {
-  const errMsg = error?.message || error?.toString() || '';
+export function classifyStellarError(error: unknown): ClassifiedError {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errObj = error as any;
+  const errMsg = errObj?.message || errObj?.toString() || '';
   const errStr = errMsg.toLowerCase();
 
   // 1. Wallet not found / not installed

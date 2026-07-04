@@ -89,6 +89,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       };
     } catch (err) {
       console.error('Failed to initialize StellarWalletsKit:', err);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(false);
     }
   }, []);
@@ -104,7 +105,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (address) {
         setPublicKey(address);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Sometimes authModal throws/rejects if the modal is closed, even if the connection
       // succeeded through event listeners. Let's verify if the wallet is actually connected.
       try {
@@ -133,7 +134,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setPublicKey(null);
       setWalletId(null);
       localStorage.removeItem('selected_wallet_id');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Wallet disconnect error:', err);
       const classified = classifyStellarError(err);
       setError(classified.message);

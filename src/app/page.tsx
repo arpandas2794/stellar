@@ -139,6 +139,7 @@ export default function Home() {
         clearTimeout(pollTimeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2. Fetch User Specific Info when Wallet Connects
@@ -146,7 +147,9 @@ export default function Home() {
     if (publicKey) {
       handleFetchUserStats(publicKey);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserNoteCount(0);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserReputation(0);
     }
   }, [publicKey]);
@@ -157,9 +160,10 @@ export default function Home() {
       const interval = setInterval(checkPendingTransactions, 3000);
       return () => clearInterval(interval);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inFlightTxs]);
 
-  const handleFetchUserStats = async (address: string) => {
+  async function handleFetchUserStats(address: string) {
     try {
       const count = await fetchNoteCount(address);
       setUserNoteCount(count);
@@ -170,7 +174,7 @@ export default function Home() {
     }
   };
 
-  const handleFetchNotes = async () => {
+  async function handleFetchNotes() {
     try {
       const data = await fetchNotes();
       const sorted = [...data].sort((a, b) => b.timestamp - a.timestamp);
@@ -203,14 +207,14 @@ export default function Home() {
         setUserNoteCount(counts[publicKey] ?? 0);
         setUserReputation(reps[publicKey] ?? 0);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch notes:', err);
       addLog('Failed to sync notes feed from RPC.', 'warning');
     }
   };
 
   // 4. Cursor-Based Event Stream Poller with Exponential Backoff
-  const startEventStream = () => {
+  function startEventStream() {
     if (pollTimeoutRef.current) {
       clearTimeout(pollTimeoutRef.current);
     }
@@ -253,7 +257,7 @@ export default function Home() {
   };
 
   // 5. Map incoming events to UI state updates
-  const processIncomingEvents = (events: ContractEvent[]) => {
+  function processIncomingEvents(events: ContractEvent[]) {
     // Group notes state updates
     let notesUpdated = false;
     let newNotes = [...notes];
@@ -344,7 +348,7 @@ export default function Home() {
   };
 
   // 6. Check In-Flight Pending Transactions
-  const checkPendingTransactions = async () => {
+  async function checkPendingTransactions() {
     const updatedTxs = await Promise.all(
       inFlightTxs.map(async (tx) => {
         if (tx.status !== 'pending') return tx;
@@ -408,7 +412,7 @@ export default function Home() {
       ]);
 
       setNoteMessage('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Submit note failed:', err);
       const classified = classifyStellarError(err);
       setFormError(classified.message);
@@ -436,7 +440,7 @@ export default function Home() {
         },
         ...prev,
       ]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`Delete note #${noteId} failed:`, err);
       const classified = classifyStellarError(err);
       setFormError(classified.message);
@@ -462,7 +466,7 @@ export default function Home() {
         },
         ...prev,
       ]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`Like note #${noteId} failed:`, err);
       const classified = classifyStellarError(err);
       setFormError(classified.message);
@@ -906,7 +910,7 @@ export default function Home() {
             </div>
             <h4 className="text-sm font-semibold text-white mb-1.5">Inter-Contract Reputation</h4>
             <p className="text-xs leading-relaxed text-slate-400">
-              Liking a note triggers a cross-contract invocation to `reputation.increment_reputation`. It uses Soroban's native contract authorization verification (`require_auth` on the caller contract ID) to restrict updates to the notes contract alone.
+              Liking a note triggers a cross-contract invocation to `reputation.increment_reputation`. It uses Soroban&apos;s native contract authorization verification (`require_auth` on the caller contract ID) to restrict updates to the notes contract alone.
             </p>
           </div>
 

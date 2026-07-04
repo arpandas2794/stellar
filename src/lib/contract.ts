@@ -70,6 +70,7 @@ export async function fetchNotes(): Promise<Note[]> {
       return [];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return nativeVal.map((item: any) => ({
       id: `${item.author}-${item.id.toString()}`,
       noteId: Number(item.id),
@@ -77,6 +78,7 @@ export async function fetchNotes(): Promise<Note[]> {
       message: item.message.toString(),
       timestamp: Number(item.timestamp),
       likes: Number(item.likes || 0),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       likers: Array.isArray(item.likers) ? item.likers.map((addr: any) => addr.toString()) : [],
     }));
   } else {
@@ -310,7 +312,7 @@ export async function fetchReputation(publicKey: string): Promise<number> {
 export interface ContractEvent {
   type: 'note_added' | 'note_liked' | 'note_deleted' | 'reputation_updated' | 'reputation_failed';
   ledger: number;
-  data: any;
+  data: unknown;
 }
 
 /**
