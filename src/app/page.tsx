@@ -549,9 +549,9 @@ export default function Home() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
         {/* Left Column: Form & Personal Stats */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
+        <div className="md:col-span-12 lg:col-span-4 flex flex-col gap-6">
           {/* Note Posting Card */}
           <div className="glass-panel rounded-2xl p-6 glow-blue relative overflow-hidden">
             <div className="absolute top-0 right-0 h-32 w-32 bg-blue-500/5 rounded-full blur-2xl" />
@@ -711,7 +711,7 @@ export default function Home() {
         </div>
 
         {/* Middle Column: Notes Feed */}
-        <div className="lg:col-span-5 flex flex-col">
+        <div className="md:col-span-7 lg:col-span-5 flex flex-col">
           <div className="glass-panel rounded-2xl p-6 glow-blue flex-1 flex flex-col min-h-[500px]">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
               <div>
@@ -839,7 +839,7 @@ export default function Home() {
         </div>
 
         {/* Right Column: Live Activity Stream / Console */}
-        <div className="lg:col-span-3 flex flex-col gap-6">
+        <div className="md:col-span-5 lg:col-span-3 flex flex-col gap-6">
           <div className="glass-panel rounded-2xl p-6 glow-indigo flex-1 flex flex-col min-h-[300px]">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Activity className="h-5 w-5 text-indigo-400" />
