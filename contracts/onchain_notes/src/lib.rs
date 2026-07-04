@@ -29,6 +29,8 @@ pub struct Note {
 pub enum DataKey {
     Notes,
     NextNoteId,
+    ReputationContract,
+    Admin,
 }
 
 #[contract]
@@ -177,7 +179,40 @@ impl OnChainNotesContract {
                     env.events().publish(
                         (Symbol::new(&env, "note_liked"),),
                         (note_id, liker.clone(), note.likes),
-                     );
+                    );
+
+                    // Cross-contract call to the reputation contract if registered
+                    let reputation_id_opt: Option<Address> = env
+                        .storage()
+                        .persistent()
+                        .get(&DataKey::ReputationContract);
+
+                    if let Some(reputation_id) = reputation_id_opt {
+                        use soroban_sdk::IntoVal;
+                        let target = note.author.clone();
+                        let call_args = (liker.clone(), target.clone(), 1u32).into_val(&env);
+
+                        let call_res = env.try_invoke_contract::<(), soroban_sdk::Error>(
+                            &reputation_id,
+                            &Symbol::new(&env, "increment_reputation"),
+                            call_args,
+                        );
+
+                        match call_res {
+                            Ok(Ok(())) => {
+                                // Reputation successfully updated
+                            }
+                            _ => {
+                                // Graceful failure: log/emit that reputation bump failed,
+                                // but do not revert the note liking itself.
+                                env.events().publish(
+                                    (Symbol::new(&env, "reputation_failed"),),
+                                    (note_id, target),
+                                );
+                            }
+                        }
+                    }
+
                     break;
                 }
             }
@@ -214,6 +249,30 @@ impl OnChainNotesContract {
             }
         }
         count
+    }
+
+    pub fn set_reputation_contract(
+        env: Env,
+        admin: Address,
+        reputation_id: Address,
+    ) -> Result<(), Error> {
+        if env.storage().persistent().has(&DataKey::Admin) {
+            let stored_admin: Address = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Admin)
+                .unwrap();
+            stored_admin.require_auth();
+        } else {
+            admin.require_auth();
+            env.storage().persistent().set(&DataKey::Admin, &admin);
+        }
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::ReputationContract, &reputation_id);
+
+        Ok(())
     }
 }
 

@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/target
+/target-reputation
+/target-onchain_notes
 /.pnp
 .pnp.*
 .yarn/*
