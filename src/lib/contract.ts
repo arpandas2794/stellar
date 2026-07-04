@@ -22,7 +22,7 @@ export interface Note {
 }
 
 const rpcUrl = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
-const contractId = process.env.NEXT_PUBLIC_CONTRACT_ID || '';
+const contractId = process.env.NEXT_PUBLIC_CONTRACT_ID || 'CBIS5O7OC2Y5ZVEB6VPTCZTOM2LR6C7BC4FIJ2E56VNVE7PZPA3N3HDA';
 
 // Initialize Soroban RPC server client
 const server = new rpc.Server(rpcUrl);
