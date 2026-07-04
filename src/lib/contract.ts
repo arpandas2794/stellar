@@ -22,7 +22,8 @@ export interface Note {
 }
 
 const rpcUrl = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
-const contractId = process.env.NEXT_PUBLIC_CONTRACT_ID || 'CBIS5O7OC2Y5ZVEB6VPTCZTOM2LR6C7BC4FIJ2E56VNVE7PZPA3N3HDA';
+const contractId = process.env.NEXT_PUBLIC_NOTES_CONTRACT_ID || process.env.NEXT_PUBLIC_CONTRACT_ID || 'CBIS5O7OC2Y5ZVEB6VPTCZTOM2LR6C7BC4FIJ2E56VNVE7PZPA3N3HDA';
+const reputationContractId = process.env.NEXT_PUBLIC_REPUTATION_CONTRACT_ID || '';
 
 // Initialize Soroban RPC server client
 const server = new rpc.Server(rpcUrl);
@@ -267,4 +268,141 @@ export async function getTransactionStatus(
     return { status: 'FAILED', error: 'Transaction execution failed.' };
   }
   return { status: 'NOT_FOUND' };
+}
+
+/**
+ * Fetch the reputation score of a public address.
+ */
+export async function fetchReputation(publicKey: string): Promise<number> {
+  if (!reputationContractId || !publicKey) return 0;
+
+  const contract = new Contract(reputationContractId);
+  const dummySource = Keypair.random();
+  const dummyAccount = new Account(dummySource.publicKey(), '0');
+
+  const tx = new TransactionBuilder(dummyAccount, {
+    fee: '100',
+    networkPassphrase: Networks.TESTNET,
+  })
+    .addOperation(
+      contract.call(
+        'get_reputation',
+        new Address(publicKey).toScVal()
+      )
+    )
+    .setTimeout(30)
+    .build();
+
+  try {
+    const simResult = await server.simulateTransaction(tx);
+    if (rpc.Api.isSimulationSuccess(simResult)) {
+      if (!simResult.result || !simResult.result.retval) return 0;
+      return Number(scValToNative(simResult.result.retval));
+    }
+  } catch (err) {
+    console.error('Error fetching reputation:', err);
+  }
+  return 0;
+}
+
+export interface ContractEvent {
+  type: 'note_added' | 'note_liked' | 'note_deleted' | 'reputation_updated' | 'reputation_failed';
+  ledger: number;
+  data: any;
+}
+
+/**
+ * Poll for events from both contracts starting from a cursor (startLedger).
+ */
+export async function pollEvents(
+  startLedger: number
+): Promise<{ events: ContractEvent[]; latestLedger: number }> {
+  const latestLedger = await getLatestLedgerSequence();
+  if (startLedger > latestLedger) {
+    return { events: [], latestLedger };
+  }
+
+  const filters = [
+    {
+      type: 'contract' as const,
+      contractId: contractId,
+    },
+  ];
+
+  if (reputationContractId) {
+    filters.push({
+      type: 'contract' as const,
+      contractId: reputationContractId,
+    });
+  }
+
+  const response = await server.getEvents({
+    startLedger,
+    filters,
+    limit: 100,
+  });
+
+  const parsedEvents: ContractEvent[] = [];
+
+  for (const event of response.events) {
+    try {
+      const topic = event.topic[0] ? scValToNative(event.topic[0]) : '';
+      const rawData = event.value ? scValToNative(event.value) : null;
+      const ledgerSeq = event.ledger;
+
+      if (topic === 'note_added') {
+        parsedEvents.push({
+          type: 'note_added',
+          ledger: ledgerSeq,
+          data: {
+            noteId: Number(rawData[0]),
+            author: rawData[1].toString(),
+            message: rawData[2].toString(),
+            timestamp: Number(rawData[3]),
+          },
+        });
+      } else if (topic === 'note_liked') {
+        parsedEvents.push({
+          type: 'note_liked',
+          ledger: ledgerSeq,
+          data: {
+            noteId: Number(rawData[0]),
+            liker: rawData[1].toString(),
+            likes: Number(rawData[2]),
+          },
+        });
+      } else if (topic === 'note_deleted') {
+        parsedEvents.push({
+          type: 'note_deleted',
+          ledger: ledgerSeq,
+          data: {
+            noteId: Number(rawData[0]),
+            author: rawData[1].toString(),
+          },
+        });
+      } else if (topic === 'reputation_updated') {
+        parsedEvents.push({
+          type: 'reputation_updated',
+          ledger: ledgerSeq,
+          data: {
+            target: rawData[0].toString(),
+            score: Number(rawData[1]),
+          },
+        });
+      } else if (topic === 'reputation_failed') {
+        parsedEvents.push({
+          type: 'reputation_failed',
+          ledger: ledgerSeq,
+          data: {
+            noteId: Number(rawData[0]),
+            target: rawData[1].toString(),
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to parse event:', event, err);
+    }
+  }
+
+  return { events: parsedEvents, latestLedger };
 }
