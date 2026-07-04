@@ -312,7 +312,8 @@ export async function fetchReputation(publicKey: string): Promise<number> {
 export interface ContractEvent {
   type: 'note_added' | 'note_liked' | 'note_deleted' | 'reputation_updated' | 'reputation_failed';
   ledger: number;
-  data: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
 }
 
 /**
