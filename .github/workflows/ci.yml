@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  rust-contracts:
+    name: Rust Smart Contracts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: actions/rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Run Workspace Unit Tests
+        run: cargo test --workspace
+
+      - name: Build Contracts to WASM
+        run: cargo build --workspace --target wasm32-unknown-unknown --release
+
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Vitest Unit Tests
+        run: npm run test
+
+      - name: Run Production Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_STELLAR_NETWORK: TESTNET
+          NEXT_PUBLIC_HORIZON_URL: https://horizon-testnet.stellar.org
+          NEXT_PUBLIC_SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+          NEXT_PUBLIC_NOTES_CONTRACT_ID: CAO6MF63ZJFSDOSEIUCZ2VHO4BJQDGAYC2EPR3GW7HWATS23VLLHADSD
+          NEXT_PUBLIC_REPUTATION_CONTRACT_ID: CC5VPHTLBKAZA7F3LF7W3DLMNTGYCPLS27W5QDLJMUEHMDRPROEW2WI3
+          NEXT_PUBLIC_CONTRACT_ID: CAO6MF63ZJFSDOSEIUCZ2VHO4BJQDGAYC2EPR3GW7HWATS23VLLHADSD
