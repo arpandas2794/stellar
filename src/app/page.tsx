@@ -736,9 +736,26 @@ export default function Home() {
             </div>
 
             {isFetchingNotes && notes.length === 0 ? (
-              <div className="flex-1 flex flex-col gap-4 justify-center items-center py-12">
-                <RefreshCw className="h-8 w-8 text-indigo-400 animate-spin" />
-                <p className="text-sm text-slate-400">Loading notes from Soroban...</p>
+              <div className="flex-1 space-y-4 pr-1">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="p-4 bg-[#070b13] border border-white/5 rounded-xl flex flex-col gap-3 animate-pulse">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full bg-slate-800" />
+                        <div className="h-3 w-24 rounded bg-slate-800" />
+                        <div className="h-3.5 w-12 rounded-full bg-slate-800" />
+                        <div className="h-3.5 w-12 rounded-full bg-slate-800" />
+                      </div>
+                      <div className="h-3 w-16 rounded bg-slate-800" />
+                    </div>
+                    <div className="h-4 w-5/6 rounded bg-slate-800 mt-1" />
+                    <div className="h-4 w-2/3 rounded bg-slate-800" />
+                    <div className="flex items-center justify-between border-t border-white/5 pt-2.5 mt-2">
+                      <div className="h-7 w-12 rounded-lg bg-slate-800" />
+                      <div className="h-7 w-16 rounded-lg bg-slate-800" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : notes.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
