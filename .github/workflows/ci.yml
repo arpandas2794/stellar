@@ -17,7 +17,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: wasm32v1-none
           
       - name: Cache Cargo Registry
         uses: actions/cache@v4
@@ -42,7 +42,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: wasm32v1-none
           
       - name: Cache Cargo Registry
         uses: actions/cache@v4
@@ -54,7 +54,7 @@ jobs:
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           
       - name: Build WASM
-        run: cargo build --workspace --target wasm32-unknown-unknown --release
+        run: cargo build --workspace --target wasm32v1-none --release
 
   frontend-lint:
     name: Frontend Code Linter
